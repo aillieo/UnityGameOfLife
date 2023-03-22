@@ -2,10 +2,6 @@
 
 RWTexture2D<float4> Result;
 
-StructuredBuffer<int> _Tiles;
-
-uint _TileCount;
-
 uint GetNeighborCount(uint3 id)
 {
     return
@@ -40,19 +36,7 @@ uint GetNewValue(uint3 id)
 [numthreads(8, 8, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
-    if (_Time.y < 1)
-    {
-        float d1 = id.x * _Time.x;
-        float d2 = pow(id.y, _Time.x);
-        float d3 = sin(d1 + id.x) * cos(d1 - id.y);
-        float d4 = d1 * d2 * d3;
-        int v = d4 > 0.5f ? 1 : 0;
-        Result[id.xy] = float4(v, v, v, 1);
-        return;
-    }
-
     int v = GetNewValue(id);
-    //int v = Result[id.xy + float2(1, 0)].x;
-    //int v = Result[id.xy].x;
+    //v = Result[id.xy + float2(1, 0)].x;
     Result[id.xy] = float4(v, v, v, 1);
 }
