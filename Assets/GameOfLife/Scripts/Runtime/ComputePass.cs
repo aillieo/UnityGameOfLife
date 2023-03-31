@@ -13,16 +13,14 @@ namespace AillieoGames
 
         //private ComputeBuffer computeBuffer;
 
-        bool initRT = false;
-
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
         {
             base.Configure(cmd, cameraTextureDescriptor);
 
-            if(!initRT)
+            if (!GameOfLifeController.initialized)
             {
                 cmd.Blit(computeConfig.initStateTexture, targetBufferId);
-                initRT = true;
+                GameOfLifeController.initialized = true;
             }
         }
 
@@ -46,12 +44,17 @@ namespace AillieoGames
             CommandBuffer cmd = CommandBufferPool.Get();
             ScriptableRenderer renderer = renderingData.cameraData.renderer;
 
-            ComputeShader computeShader = this.computeConfig.computeShader;
+            if (GameOfLifeController.compute)
+            {
+                GameOfLifeController.compute = false;
 
-            int kernelHandle = computeShader.FindKernel("CSMain");
+                ComputeShader computeShader = this.computeConfig.computeShader;
 
-            cmd.SetComputeTextureParam(computeShader, kernelHandle, resultId, targetBufferId);
-            cmd.DispatchCompute(computeShader, kernelHandle, Mathf.CeilToInt(Screen.width / 8), Mathf.CeilToInt(Screen.height / 8), 1);
+                int kernelHandle = computeShader.FindKernel("CSMain");
+
+                cmd.SetComputeTextureParam(computeShader, kernelHandle, resultId, targetBufferId);
+                cmd.DispatchCompute(computeShader, kernelHandle, computeConfig.initStateTexture.width / 8, computeConfig.initStateTexture.height / 8, 1);
+            }
 
             this.Blit(cmd, targetBufferId, renderer.cameraColorTarget);
 

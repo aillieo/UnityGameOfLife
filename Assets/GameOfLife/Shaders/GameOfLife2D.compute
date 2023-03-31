@@ -36,6 +36,9 @@ uint GetNewValue(uint3 id)
 [numthreads(8, 8, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
+    // uint width, height;
+    // Result.GetDimensions(width, height);
+
     int v = GetNewValue(id);
     //v = Result[id.xy + float2(1, 0)].x;
     Result[id.xy] = float4(v, v, v, 1);
